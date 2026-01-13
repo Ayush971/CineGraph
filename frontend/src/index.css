@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+@theme {
+  --color-primary: #e50914;
+  /* --color-background: #0a0a0a; */
+  /* --color-surface: #1a1a1a; */
+  --color-surface-light: #2a2a2a;
+
+  --animate-scroll-horizontal: scroll-horizontal 60s linear infinite;
+}
+
+:root {
+  --background: 15 23 42;
+}
+
+body {
+  background-color: rgb(var(--background));
+  color: white;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Horizontal scroll animation */
+@keyframes scroll-horizontal {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-25%); /* Move by 1 image width (1/4 of container) */
+  }
+}
+
+.animate-scroll-horizontal {
+  animation: scroll-horizontal 20s linear infinite; /* Faster speed for smooth look */
+}
