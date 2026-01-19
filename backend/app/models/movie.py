@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, Date, DateTime
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.config.database import Base
 
@@ -14,3 +15,6 @@ class Movie(Base):
     backdrop_path = Column(String(255), nullable=True)
     runtime = Column(Integer, nullable=True)
     cached_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships
+    diary_entries = relationship("DiaryEntry", back_populates="movie", cascade="all, delete-orphan")

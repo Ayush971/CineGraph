@@ -24,14 +24,27 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Navigation Links */}
-          <div className="flex items-center gap-6 shrink-0">
+          <div className="flex items-center gap-6">
             <Link
               to="/movies"
               className="text-white hover:text-primary transition-colors hidden sm:block"
             >
               Movies
             </Link>
-
+            <Link
+              to="/series"
+              className="text-white hover:text-primary transition-colors hidden sm:block"
+            >
+              Series
+            </Link>
+            {user && (
+              <Link
+                to="/diary"
+                className="text-white hover:text-primary transition-colors hidden sm:block"
+              >
+                Diary
+              </Link>
+            )}
             {user ? (
               <>
                 <Link

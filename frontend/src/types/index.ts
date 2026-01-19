@@ -75,3 +75,65 @@ export interface MovieListResponse {
   total_pages: number;
   total_results: number;
 }
+
+// Diary types
+export interface DiaryEntryCreate {
+  movie_id: number;
+  watched_date: string;
+  rating?: number;
+  review?: string;
+  is_rewatch: boolean;
+}
+
+export interface DiaryEntryUpdate {
+  watched_date?: string;
+  rating?: number;
+  review?: string;
+  is_rewatch?: boolean;
+}
+
+export interface DiaryEntryResponse {
+  id: number;
+  user_id: number;
+  movie_id: number;
+  watched_date: string;
+  rating?: number;
+  review?: string;
+  is_rewatch: boolean;
+  created_at: string;
+  updated_at?: string;
+  movie: {
+    id: number;
+    tmdb_id: number;
+    title: string;
+    poster_path?: string;
+    release_date?: string;
+  };
+}
+
+export interface DiaryStats {
+  total_movies: number;
+  total_entries: number;
+  average_rating?: number;
+  total_rewatches: number;
+  films_this_year: number;
+  films_this_month: number;
+}
+
+export interface MovieLogStatus {
+  logged: boolean;
+  entries: Array<{
+    id: number;
+    watched_date: string;
+    rating?: number;
+    review?: string;
+    is_rewatch: boolean;
+  }>;
+  latest?: {
+    id: number;
+    watched_date: string;
+    rating?: number;
+    review?: string;
+    is_rewatch: boolean;
+  };
+}

@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.config.database import engine, Base
-from app.routes import auth, movies
+from app.routes import auth, movies, diary
 import os
 from dotenv import load_dotenv
 
@@ -26,7 +26,11 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,6 +39,7 @@ app.add_middleware(
 # Include routers
 app.include_router(auth.router)
 app.include_router(movies.router)
+app.include_router(diary.router)
 
 
 # Root endpoint
@@ -44,7 +49,7 @@ def read_root():
         "message": "Welcome to CineGraph API 🎬",
         "version": "1.0.0",
         "docs": "/docs",
-        "endpoints": {"auth": "/auth", "movies": "/movies"},
+        "endpoints": {"auth": "/auth", "movies": "/movies", "diary": "/diary"},
     }
 
 
