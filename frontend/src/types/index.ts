@@ -137,3 +137,71 @@ export interface MovieLogStatus {
     is_rewatch: boolean;
   };
 }
+
+// List types
+export interface MovieList {
+  id: number;
+  user_id: number;
+  title: string;
+  description?: string;
+  is_public: boolean;
+  created_at: string;
+  updated_at?: string;
+  item_count: number;
+  owner_username: string;
+}
+
+export interface MovieListCreate {
+  title: string;
+  description?: string;
+  is_public: boolean;
+}
+
+export interface MovieListUpdate {
+  title?: string;
+  description?: string;
+  is_public?: boolean;
+}
+
+export interface ListItemMovie {
+  id: number;
+  tmdb_id: number;
+  title: string;
+  poster_path?: string;
+  release_date?: string;
+  backdrop_path?: string;
+  runtime?: number;
+}
+
+export interface ListItem {
+  id: number;
+  list_id: number;
+  movie_id: number;
+  rank: number;
+  notes?: string;
+  added_at: string;
+  movie: ListItemMovie;
+}
+
+export interface ListItemCreate {
+  movie_id: number;
+  rank?: number;
+  notes?: string;
+}
+
+export interface ListDetailResponse {
+  id: number;
+  user_id: number;
+  title: string;
+  description?: string;
+  is_public: boolean;
+  created_at: string;
+  updated_at?: string;
+  owner_username: string;
+  items: ListItem[];
+}
+
+export interface ListReorderItem {
+  item_id: number;
+  rank: number;
+}

@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.config.database import Base
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -16,4 +17,9 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
-    diary_entries = relationship("DiaryEntry", back_populates="user", cascade="all, delete-orphan")
+    diary_entries = relationship(
+        "DiaryEntry", back_populates="user", cascade="all, delete-orphan"
+    )
+    lists = relationship(
+        "MovieList", back_populates="user", cascade="all, delete-orphan"
+    )

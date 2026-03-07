@@ -9,6 +9,9 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
 import SearchPage from "./pages/SearchPage";
+import ListsPage from "./pages/ListsPage";
+import ListDetailPage from "./pages/ListDetailPage";
+import ListDiscoverPage from "./pages/ListDiscoverPage";
 
 function App() {
   return (
@@ -50,6 +53,9 @@ function AppContent() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/movie/:id" element={<MovieDetailPage />} />
               <Route path="/search" element={<SearchPage />} />
+              <Route path="/lists" element={<ListsPage />} />
+              <Route path="/lists/discover" element={<ListDiscoverPage />} />
+              <Route path="/lists/:id" element={<ListDetailPage />} />
             </Routes>
           </div>
         }

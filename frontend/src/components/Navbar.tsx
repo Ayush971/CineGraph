@@ -45,6 +45,14 @@ const Navbar: React.FC = () => {
                 Diary
               </Link>
             )}
+            {user && (
+              <Link
+                to="/lists"
+                className="text-white hover:text-primary transition-colors hidden sm:block"
+              >
+                Lists
+              </Link>
+            )}
             {user ? (
               <>
                 <Link

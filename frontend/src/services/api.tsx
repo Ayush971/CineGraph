@@ -10,7 +10,14 @@ import type {
   DiaryEntryUpdate,
   DiaryEntryResponse,
   DiaryStats,
-  MovieLogStatus
+  MovieLogStatus,
+  MovieList,
+  MovieListCreate,
+  MovieListUpdate,
+  ListDetailResponse,
+  ListItem,
+  ListItemCreate,
+  ListReorderItem
 } from '../types';
 
 const API_BASE_URL = 'http://localhost:8000';
@@ -93,6 +100,39 @@ export const diaryAPI = {
   
   getStats: () => 
     api.get<DiaryStats>('/diary/stats'),
+};
+
+// Lists API
+export const listsAPI = {
+  create: (data: MovieListCreate) =>
+    api.post<MovieList>('/lists/', data),
+
+  getMyLists: () =>
+    api.get<MovieList[]>('/lists/'),
+
+  getDetail: (listId: number) =>
+    api.get<ListDetailResponse>(`/lists/${listId}`),
+
+  update: (listId: number, data: MovieListUpdate) =>
+    api.put<MovieList>(`/lists/${listId}`, data),
+
+  delete: (listId: number) =>
+    api.delete(`/lists/${listId}`),
+
+  discover: (params?: { skip?: number; limit?: number; search?: string }) =>
+    api.get<MovieList[]>('/lists/discover', { params }),
+
+  getShared: (listId: number) =>
+    api.get<ListDetailResponse>(`/lists/share/${listId}`),
+
+  addItem: (listId: number, item: ListItemCreate) =>
+    api.post<ListItem>(`/lists/${listId}/items`, item),
+
+  reorderItems: (listId: number, items: ListReorderItem[]) =>
+    api.put<ListItem[]>(`/lists/${listId}/items/reorder`, { items }),
+
+  removeItem: (listId: number, itemId: number) =>
+    api.delete(`/lists/${listId}/items/${itemId}`),
 };
 
 export default api;

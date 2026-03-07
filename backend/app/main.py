@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.config.database import engine, Base
-from app.routes import auth, movies, diary
+from app.routes import auth, movies, diary, lists
 import os
 from dotenv import load_dotenv
 
@@ -40,6 +40,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(movies.router)
 app.include_router(diary.router)
+app.include_router(lists.router)
 
 
 # Root endpoint
@@ -49,7 +50,12 @@ def read_root():
         "message": "Welcome to CineGraph API 🎬",
         "version": "1.0.0",
         "docs": "/docs",
-        "endpoints": {"auth": "/auth", "movies": "/movies", "diary": "/diary"},
+        "endpoints": {
+            "auth": "/auth",
+            "movies": "/movies",
+            "diary": "/diary",
+            "lists": "/lists",
+        },
     }
 
 
