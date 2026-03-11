@@ -8,6 +8,7 @@ import CastList from "../components/CastList";
 import CrewList from "../components/CrewList";
 import OTTSection from "../components/OTTSection";
 import DiaryEntryModal from "../components/DiaryEntryModal";
+import CommentSection from "../components/CommentSection";
 import type { MovieDetail, MovieLogStatus } from "../types";
 
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
@@ -311,6 +312,9 @@ const MovieDetailPage: React.FC = () => {
 
         {/* Crew Section */}
         {movie.credits?.crew && <CrewList crew={movie.credits.crew} />}
+
+        {/* Comments / Discussion Section */}
+        {id && <CommentSection movieTmdbId={Number(id)} />}
       </div>
 
       {/* Diary Modal */}

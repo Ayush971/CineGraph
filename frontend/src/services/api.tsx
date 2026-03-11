@@ -135,4 +135,52 @@ export const listsAPI = {
     api.delete(`/lists/${listId}/items/${itemId}`),
 };
 
+// Comments API
+export const commentsAPI = {
+  getForMovie: (tmdbId: number, sort: string = 'newest') =>
+    api.get(`/comments/movie/${tmdbId}?sort=${sort}`),
+
+  getCount: (tmdbId: number) =>
+    api.get<{ count: number }>(`/comments/movie/${tmdbId}/count`),
+
+  create: (tmdbId: number, data: { content: string; parent_id?: number }) =>
+    api.post(`/comments/movie/${tmdbId}`, data),
+
+  update: (commentId: number, data: { content: string }) =>
+    api.put(`/comments/${commentId}`, data),
+
+  delete: (commentId: number) =>
+    api.delete(`/comments/${commentId}`),
+};
+
+// Social API
+export const socialAPI = {
+  follow: (userId: number) =>
+    api.post(`/social/follow/${userId}`),
+
+  unfollow: (userId: number) =>
+    api.delete(`/social/follow/${userId}`),
+
+  getFollowers: (userId: number) =>
+    api.get(`/social/followers/${userId}`),
+
+  getFollowing: (userId: number) =>
+    api.get(`/social/following/${userId}`),
+
+  getProfile: (userId: number) =>
+    api.get(`/social/profile/${userId}`),
+
+  getFeed: (params?: { skip?: number; limit?: number }) =>
+    api.get('/social/feed', { params }),
+};
+
+// Likes API
+export const likesAPI = {
+  toggle: (targetType: string, targetId: number) =>
+    api.post('/likes/toggle', { target_type: targetType, target_id: targetId }),
+
+  getStatus: (targetType: string, targetId: number) =>
+    api.get(`/likes/status/${targetType}/${targetId}`),
+};
+
 export default api;

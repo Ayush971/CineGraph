@@ -15,3 +15,16 @@ from app.schemas.list import (
     ListDetailResponse,
     ListReorderRequest,
 )
+from app.schemas.comment import (
+    CommentCreate,
+    CommentUpdate,
+    CommentResponse,
+    CommentTreeResponse,
+)
+from app.schemas.social import (
+    FollowResponse,
+    UserProfileResponse,
+    ActivityItem,
+    ActivityFeedResponse,
+)
+from app.schemas.like import LikeToggleRequest, LikeResponse

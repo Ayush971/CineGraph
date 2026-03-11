@@ -205,3 +205,73 @@ export interface ListReorderItem {
   item_id: number;
   rank: number;
 }
+
+// ==================== SOCIAL FEATURES ====================
+
+export interface CommentAuthor {
+  id: number;
+  username: string;
+  avatar_url?: string;
+}
+
+export interface CommentCreate {
+  content: string;
+  parent_id?: number;
+}
+
+export interface CommentTree {
+  id: number;
+  movie_id: number;
+  user_id: number;
+  parent_id?: number;
+  content: string;
+  is_edited: boolean;
+  created_at: string;
+  updated_at?: string;
+  author: CommentAuthor;
+  like_count: number;
+  user_liked: boolean;
+  reply_count: number;
+  replies: CommentTree[];
+}
+
+export interface FollowUser {
+  id: number;
+  username: string;
+  avatar_url?: string;
+  bio?: string;
+}
+
+export interface UserProfile {
+  id: number;
+  username: string;
+  email: string;
+  avatar_url?: string;
+  bio?: string;
+  created_at: string;
+  follower_count: number;
+  following_count: number;
+  is_following: boolean;
+  total_movies_watched: number;
+  total_lists: number;
+}
+
+export interface ActivityItem {
+  type: string;
+  user: FollowUser;
+  movie_title: string;
+  movie_id: number;
+  movie_poster?: string;
+  detail?: string;
+  timestamp: string;
+}
+
+export interface ActivityFeed {
+  items: ActivityItem[];
+  has_more: boolean;
+}
+
+export interface LikeStatus {
+  liked: boolean;
+  like_count: number;
+}

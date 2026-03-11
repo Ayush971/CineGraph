@@ -24,3 +24,6 @@ class Movie(Base):
     list_items = relationship(
         "ListItem", back_populates="movie", cascade="all, delete-orphan"
     )
+    comments = relationship(
+        "Comment", back_populates="movie", cascade="all, delete-orphan"
+    )
