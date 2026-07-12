@@ -275,3 +275,101 @@ export interface LikeStatus {
   liked: boolean;
   like_count: number;
 }
+
+// ==================== ACHIEVEMENTS ====================
+
+export interface Achievement {
+  id: number;
+  title: string;
+  description: string;
+  icon: string;
+  criteria_type: string;
+  category: string;
+  tier: string;
+}
+
+export interface UserAchievement {
+  achievement: Achievement;
+  earned_at: string;
+}
+
+export interface AchievementProgress {
+  achievement: Achievement;
+  earned: boolean;
+  earned_at?: string;
+  current: number;
+  target: number;
+  progress_text: string;
+}
+
+// ==================== ANALYTICS ====================
+
+export interface GenreBreakdown {
+  genre: string;
+  count: number;
+  percentage: number;
+}
+
+export interface MonthlyCount {
+  month: number;
+  year: number;
+  count: number;
+  label: string;
+}
+
+export interface DecadeCount {
+  decade: string;
+  count: number;
+}
+
+export interface PersonCount {
+  person_id: number;
+  name: string;
+  profile_path?: string;
+  count: number;
+}
+
+export interface WatchStreakData {
+  current_streak: number;
+  longest_streak: number;
+  last_watched?: string;
+}
+
+export interface RatingDistribution {
+  rating: number;
+  count: number;
+}
+
+export interface AnalyticsOverview {
+  genres: GenreBreakdown[];
+  monthly: MonthlyCount[];
+  decades: DecadeCount[];
+  top_actors: PersonCount[];
+  top_directors: PersonCount[];
+  streaks: WatchStreakData;
+  total_runtime_hours: number;
+  average_rating?: number;
+  total_movies: number;
+}
+
+export interface YearInReview {
+  year: number;
+  total_movies: number;
+  total_hours: number;
+  total_entries: number;
+  average_rating?: number;
+  top_genre?: string;
+  top_actor?: PersonCount;
+  top_director?: PersonCount;
+  top_rated_movie?: {
+    title: string;
+    tmdb_id: number;
+    poster_path?: string;
+    rating: number;
+  };
+  monthly: MonthlyCount[];
+  genres: GenreBreakdown[];
+  rating_distribution: RatingDistribution[];
+  most_watched_month?: string;
+  longest_streak: number;
+}

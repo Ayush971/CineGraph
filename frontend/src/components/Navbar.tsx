@@ -61,6 +61,14 @@ const Navbar: React.FC = () => {
                 Feed
               </Link>
             )}
+            {user && (
+              <Link
+                to="/analytics"
+                className="text-white hover:text-primary transition-colors hidden sm:block"
+              >
+                Analytics
+              </Link>
+            )}
             {user ? (
               <>
                 <Link

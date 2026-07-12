@@ -14,6 +14,7 @@ from app.schemas.diary import (
     DiaryStats
 )
 from app.utils.dependencies import get_current_user
+from app.services.achievement_engine import check_achievements
 
 router = APIRouter(prefix="/diary", tags=["Diary"])
 
@@ -47,6 +48,12 @@ def create_diary_entry(
     db.add(new_entry)
     db.commit()
     db.refresh(new_entry)
+    
+    # Check and award any newly earned achievements
+    try:
+        check_achievements(current_user.id, db)
+    except Exception:
+        pass  # Don't fail diary entry creation if achievement check fails
     
     # Prepare response with movie details
     response = DiaryEntryResponse(

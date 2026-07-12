@@ -28,3 +28,17 @@ from app.schemas.social import (
     ActivityFeedResponse,
 )
 from app.schemas.like import LikeToggleRequest, LikeResponse
+from app.schemas.achievement import (
+    AchievementResponse,
+    UserAchievementResponse,
+    AchievementProgress,
+)
+from app.schemas.analytics import (
+    GenreBreakdown,
+    MonthlyCount,
+    DecadeCount,
+    PersonCount,
+    WatchStreak,
+    AnalyticsOverview,
+    YearInReviewResponse,
+)

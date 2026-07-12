@@ -6,3 +6,4 @@ from app.models.list_item import ListItem
 from app.models.comment import Comment
 from app.models.follow import Follow
 from app.models.like import Like
+from app.models.achievement import Achievement, UserAchievement

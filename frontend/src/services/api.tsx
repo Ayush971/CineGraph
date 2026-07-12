@@ -183,4 +183,40 @@ export const likesAPI = {
     api.get(`/likes/status/${targetType}/${targetId}`),
 };
 
+// Achievements API
+export const achievementsAPI = {
+  getAll: () =>
+    api.get('/achievements/'),
+
+  getMy: () =>
+    api.get('/achievements/my'),
+
+  check: () =>
+    api.post('/achievements/check'),
+};
+
+// Analytics API
+export const analyticsAPI = {
+  getOverview: () =>
+    api.get('/analytics/overview'),
+
+  getGenres: () =>
+    api.get('/analytics/genres'),
+
+  getMonthly: (year?: number) =>
+    api.get('/analytics/monthly', { params: year ? { year } : {} }),
+
+  getDecades: () =>
+    api.get('/analytics/decades'),
+
+  getPeople: () =>
+    api.get('/analytics/people'),
+
+  getStreaks: () =>
+    api.get('/analytics/streaks'),
+
+  getYearInReview: (year?: number) =>
+    api.get('/analytics/year-in-review', { params: year ? { year } : {} }),
+};
+
 export default api;

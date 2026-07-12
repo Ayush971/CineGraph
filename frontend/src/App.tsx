@@ -14,6 +14,9 @@ import ListDetailPage from "./pages/ListDetailPage";
 import ListDiscoverPage from "./pages/ListDiscoverPage";
 import ActivityFeedPage from "./pages/ActivityFeedPage";
 import UserProfilePage from "./pages/UserProfilePage";
+import AchievementsPage from "./pages/AchievementsPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+import YearInReviewPage from "./pages/YearInReviewPage";
 
 function App() {
   return (
@@ -60,6 +63,9 @@ function AppContent() {
               <Route path="/lists/:id" element={<ListDetailPage />} />
               <Route path="/feed" element={<ActivityFeedPage />} />
               <Route path="/user/:id" element={<UserProfilePage />} />
+              <Route path="/achievements" element={<AchievementsPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/year-in-review" element={<YearInReviewPage />} />
             </Routes>
           </div>
         }

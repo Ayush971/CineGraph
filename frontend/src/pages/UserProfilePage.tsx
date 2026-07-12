@@ -149,6 +149,39 @@ const UserProfilePage: React.FC = () => {
         </div>
       </div>
 
+      {/* Quick links for own profile */}
+      {isOwnProfile && (
+        <div className="flex gap-3 mb-8">
+          <Link
+            to="/achievements"
+            className="flex items-center gap-2 px-4 py-2.5 bg-surface-light rounded-xl border border-white/5 hover:border-yellow-400/30 transition-all group"
+          >
+            <span className="text-lg">🏆</span>
+            <span className="text-sm font-medium text-gray-400 group-hover:text-white transition-colors">
+              Achievements
+            </span>
+          </Link>
+          <Link
+            to="/analytics"
+            className="flex items-center gap-2 px-4 py-2.5 bg-surface-light rounded-xl border border-white/5 hover:border-blue-400/30 transition-all group"
+          >
+            <span className="text-lg">📊</span>
+            <span className="text-sm font-medium text-gray-400 group-hover:text-white transition-colors">
+              Analytics
+            </span>
+          </Link>
+          <Link
+            to="/year-in-review"
+            className="flex items-center gap-2 px-4 py-2.5 bg-surface-light rounded-xl border border-white/5 hover:border-purple-400/30 transition-all group"
+          >
+            <span className="text-lg">🎬</span>
+            <span className="text-sm font-medium text-gray-400 group-hover:text-white transition-colors">
+              Year in Review
+            </span>
+          </Link>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="flex gap-1 bg-surface-light rounded-lg p-0.5 border border-white/5 mb-6 w-fit">
         <button

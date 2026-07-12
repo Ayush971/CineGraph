@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.config.database import engine, Base
-from app.routes import auth, movies, diary, lists, comments, social, likes
+from app.routes import auth, movies, diary, lists, comments, social, likes, achievements, analytics
 import os
 from dotenv import load_dotenv
 
@@ -44,6 +44,8 @@ app.include_router(lists.router)
 app.include_router(comments.router)
 app.include_router(social.router)
 app.include_router(likes.router)
+app.include_router(achievements.router)
+app.include_router(analytics.router)
 
 
 # Root endpoint
@@ -61,6 +63,8 @@ def read_root():
             "comments": "/comments",
             "social": "/social",
             "likes": "/likes",
+            "achievements": "/achievements",
+            "analytics": "/analytics",
         },
     }
 

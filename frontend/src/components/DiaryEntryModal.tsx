@@ -33,13 +33,20 @@ const DiaryEntryModal: React.FC<DiaryEntryModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // We're editing an existing entry only if it has a real database id.
+  // A pre-filled object (e.g. just a rating from the movie page) has no id
+  // and should create a new entry, not update one.
+  const isEditing = !!existingEntry?.id;
+
   // Initialize form with existing entry data
   useEffect(() => {
     if (existingEntry) {
-      setWatchedDate(existingEntry.watched_date);
+      setWatchedDate(
+        existingEntry.watched_date || new Date().toISOString().split('T')[0]
+      );
       setRating(existingEntry.rating || 0);
       setReview(existingEntry.review || '');
-      setIsRewatch(existingEntry.is_rewatch);
+      setIsRewatch(existingEntry.is_rewatch || false);
     } else {
       // Default to today's date
       setWatchedDate(new Date().toISOString().split('T')[0]);
@@ -55,7 +62,7 @@ const DiaryEntryModal: React.FC<DiaryEntryModalProps> = ({
     setLoading(true);
 
     try {
-      if (existingEntry) {
+      if (isEditing) {
         // Update existing entry
         const updateData: DiaryEntryUpdate = {
           watched_date: watchedDate,
@@ -92,7 +99,7 @@ const DiaryEntryModal: React.FC<DiaryEntryModalProps> = ({
         {/* Header */}
         <div className="sticky top-0 bg-surface border-b border-surface-light p-6 flex justify-between items-center">
           <h2 className="text-2xl font-bold">
-            {existingEntry ? 'Edit Entry' : 'Log Movie'}
+            {isEditing ? 'Edit Entry' : 'Log Movie'}
           </h2>
           <button
             onClick={onClose}
@@ -195,7 +202,7 @@ const DiaryEntryModal: React.FC<DiaryEntryModalProps> = ({
               disabled={loading}
               className="flex-1 py-3 bg-primary text-white rounded font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Saving...' : existingEntry ? 'Update Entry' : 'Save Entry'}
+              {loading ? 'Saving...' : isEditing ? 'Update Entry' : 'Save Entry'}
             </button>
             <button
               type="button"
