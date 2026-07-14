@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { recommendationsAPI } from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import LoadingSpinner from "../components/LoadingSpinner";
 import Button from "../components/ui/Button";
 import { PosterGridSkeleton } from "../components/ui/Skeleton";
 import type { Recommendation } from "../types";
