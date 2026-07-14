@@ -1,0 +1,48 @@
+# Render Blueprint — deploys the CineGraph backend + Postgres + Redis.
+# In Render: New → Blueprint → connect this repo. It reads this file.
+# Secrets marked `sync: false` must be filled in the dashboard after creation.
+services:
+  # ---- FastAPI backend ----
+  - type: web
+    name: cinegraph-api
+    runtime: python
+    rootDir: backend
+    plan: free # free web services sleep after 15 min idle (cold start ~50s)
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cinegraph-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: cinegraph-redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true # Render generates a strong random secret
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "43200"
+      - key: TMDB_BASE_URL
+        value: https://api.themoviedb.org/3
+      - key: TMDB_IMAGE_BASE_URL
+        value: https://image.tmdb.org/t/p
+      - key: TMDB_API_KEY
+        sync: false # paste your TMDB key in the dashboard
+      - key: CORS_ORIGINS
+        sync: false # set to your Vercel URL, e.g. https://cinegraph.vercel.app
+
+  # ---- Redis (recommendations cache; app degrades gracefully without it) ----
+  - type: redis
+    name: cinegraph-redis
+    plan: free
+    ipAllowList: [] # empty = reachable only from your Render services
+
+# ---- PostgreSQL ----
+databases:
+  - name: cinegraph-db
+    plan: free # NOTE: Render deletes free databases after 90 days
