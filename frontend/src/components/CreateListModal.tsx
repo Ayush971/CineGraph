@@ -146,7 +146,7 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
             <button
               type="submit"
               disabled={!title.trim() || saving}
-              className="flex-1 px-4 py-3 bg-primary hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-colors font-medium"
+              className="flex-1 px-4 py-3 bg-primary hover:bg-tungsten-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-colors font-medium"
             >
               {saving ? "Saving..." : editList ? "Save Changes" : "Create List"}
             </button>

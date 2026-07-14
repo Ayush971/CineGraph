@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { moviesAPI } from "../services/api";
 import type { Movie } from "../types";
 
@@ -71,11 +72,11 @@ const SearchBar: React.FC = () => {
             onFocus={() => {
               if (predictions.length > 0) setShowPredictions(true);
             }}
-            placeholder="Search movies..."
-            className="w-full px-4 py-2 pl-10 bg-surface-light border border-gray-700 rounded-lg focus:outline-none focus:border-primary transition-colors text-white text-sm"
+            placeholder="Search movies…"
+            className="w-full px-4 py-2 pl-10 bg-surface-3 border border-line rounded-md text-ink text-sm placeholder:text-ink-faint focus:outline-none focus:border-daylight-400/60 focus:shadow-[var(--shadow-glow-cool)] transition-[border-color,box-shadow] duration-150"
           />
           <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-faint"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -94,7 +95,7 @@ const SearchBar: React.FC = () => {
                 setQuery("");
                 setShowPredictions(false);
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink transition-colors cursor-pointer"
             >
               <svg
                 className="w-4 h-4"
@@ -115,51 +116,59 @@ const SearchBar: React.FC = () => {
       </form>
 
       {/* Predictions Dropdown */}
-      {showPredictions && predictions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900 border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
-          {predictions.map((movie) => (
-            <div
-              key={movie.id}
-              onClick={() => handlePredictionClick(movie.id)}
-              className="flex items-center gap-3 p-3 hover:bg-surface-light cursor-pointer transition-colors border-b border-gray-800 last:border-none"
-            >
-              {/* Poster */}
-              <div className="w-12 h-16 shrink-0 bg-gray-800 rounded overflow-hidden">
-                {movie.poster_path ? (
-                  <img
-                    src={`https://image.tmdb.org/t/p/w92${movie.poster_path}`}
-                    alt={movie.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-500">
-                    <span className="text-xs">No Img</span>
-                  </div>
-                )}
-              </div>
+      <AnimatePresence>
+        {showPredictions && predictions.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 6, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.985 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute top-full left-0 right-0 mt-2 bg-surface-2 border border-line-strong rounded-lg shadow-[var(--shadow-lift)] z-50 overflow-hidden"
+          >
+            {predictions.map((movie) => (
+              <div
+                key={movie.id}
+                onClick={() => handlePredictionClick(movie.id)}
+                className="flex items-center gap-3 p-3 hover:bg-surface-3 cursor-pointer transition-colors duration-150 border-b border-line last:border-none"
+              >
+                {/* Poster */}
+                <div className="w-10 h-[60px] shrink-0 bg-surface-3 rounded overflow-hidden">
+                  {movie.poster_path ? (
+                    <img
+                      src={`https://image.tmdb.org/t/p/w92${movie.poster_path}`}
+                      alt={movie.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="meta !text-[0.6rem]">N/A</span>
+                    </div>
+                  )}
+                </div>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-white truncate">
-                  {movie.title}
-                </h4>
-                <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
-                  <span>
-                    {movie.release_date
-                      ? new Date(movie.release_date).getFullYear()
-                      : "TBA"}
-                  </span>
-                  <span>•</span>
-                  <div className="flex items-center text-yellow-500">
-                    <span className="mr-1">★</span>
-                    {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-sm text-ink truncate">
+                    {movie.title}
+                  </h4>
+                  <div className="meta mt-1 flex items-center gap-2">
+                    <span>
+                      {movie.release_date
+                        ? new Date(movie.release_date).getFullYear()
+                        : "TBA"}
+                    </span>
+                    {movie.vote_average ? (
+                      <span className="text-tungsten-300">
+                        ★ {movie.vote_average.toFixed(1)}
+                      </span>
+                    ) : null}
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

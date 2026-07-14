@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.orm import Session
 from app.config.database import get_db
 from app.models.movie import Movie
 from app.schemas.movie import MovieResponse, MovieDetail, MovieListResponse
 from app.services.tmdb import tmdb_service
+from functools import lru_cache
 from typing import Optional
 import json
+import re
+import requests
 
 router = APIRouter(prefix="/movies", tags=["Movies"])
 
@@ -57,6 +60,47 @@ def search_movies(
 def get_movie_watch_providers(movie_id: int):
     """Get watch providers for a movie"""
     data = tmdb_service.get_watch_providers(movie_id)
+    return data
+
+
+# CORS-friendly poster proxy.
+# TMDB's image CDN sends no CORS headers, which blocks WebGL textures and
+# canvas color extraction on the frontend — so we relay the bytes ourselves.
+TMDB_IMG_SIZES = {"w92", "w154", "w185", "w342", "w500", "w780", "original"}
+
+
+@lru_cache(maxsize=256)
+def _fetch_poster(size: str, file_name: str) -> tuple:
+    resp = requests.get(
+        f"https://image.tmdb.org/t/p/{size}/{file_name}", timeout=10
+    )
+    resp.raise_for_status()
+    return resp.content, resp.headers.get("content-type", "image/jpeg")
+
+
+@router.get("/poster-img/{size}/{file_name}")
+def poster_image(size: str, file_name: str):
+    """Proxy a TMDB poster with CORS + caching headers."""
+    if size not in TMDB_IMG_SIZES or not re.fullmatch(
+        r"[A-Za-z0-9_-]+\.(jpg|jpeg|png|webp)", file_name
+    ):
+        raise HTTPException(status_code=400, detail="Invalid poster request")
+    try:
+        content, media_type = _fetch_poster(size, file_name)
+    except requests.RequestException:
+        raise HTTPException(status_code=502, detail="Poster fetch failed")
+    return Response(
+        content=content,
+        media_type=media_type,
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
+# Get related films (TMDB recommendations)
+@router.get("/{movie_id}/recommendations", response_model=MovieListResponse)
+def get_movie_recommendations(movie_id: int, page: int = Query(1, ge=1, le=500)):
+    """Get related films for a movie, powered by TMDB recommendations"""
+    data = tmdb_service.get_recommendations(movie_id, page)
     return data
 
 

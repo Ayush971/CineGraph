@@ -17,10 +17,11 @@ import type {
   ListDetailResponse,
   ListItem,
   ListItemCreate,
-  ListReorderItem
+  ListReorderItem,
+  RecommendationResponse
 } from '../types';
 
-const API_BASE_URL = 'http://localhost:8000';
+export const API_BASE_URL = 'http://localhost:8000';
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
@@ -74,8 +75,11 @@ export const moviesAPI = {
   getDetails: (movieId: number) => 
     api.get<MovieDetail>(`/movies/${movieId}`),
   
-  getWatchProviders: (movieId: number) => 
+  getWatchProviders: (movieId: number) =>
     api.get(`/movies/${movieId}/watch-providers`),
+
+  getRecommendations: (movieId: number, page: number = 1) =>
+    api.get<MovieListResponse>(`/movies/${movieId}/recommendations?page=${page}`),
 };
 
 // Diary API
@@ -217,6 +221,25 @@ export const analyticsAPI = {
 
   getYearInReview: (year?: number) =>
     api.get('/analytics/year-in-review', { params: year ? { year } : {} }),
+};
+
+// Recommendations API
+export const recommendationsAPI = {
+  getForYou: (limit?: number) =>
+    api.get<RecommendationResponse>('/recommendations/for-you', {
+      params: limit ? { limit } : {},
+    }),
+
+  becauseYouWatched: (tmdbId: number, limit?: number) =>
+    api.get<RecommendationResponse>(
+      `/recommendations/because-you-watched/${tmdbId}`,
+      { params: limit ? { limit } : {} }
+    ),
+
+  refresh: (limit?: number) =>
+    api.post<RecommendationResponse>('/recommendations/refresh', null, {
+      params: limit ? { limit } : {},
+    }),
 };
 
 export default api;

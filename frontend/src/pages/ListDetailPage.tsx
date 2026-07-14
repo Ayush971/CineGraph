@@ -286,7 +286,7 @@ const ListDetailPage: React.FC = () => {
             {isOwner && (
               <button
                 onClick={() => setShowSearch(!showSearch)}
-                className="px-4 py-2.5 bg-primary hover:bg-red-700 text-white rounded-xl transition-colors text-sm font-medium flex items-center gap-2"
+                className="px-4 py-2.5 bg-primary hover:bg-tungsten-500 hover:shadow-glow text-void rounded-xl transition-colors text-sm font-medium flex items-center gap-2"
               >
                 <span className="text-base">+</span> Add Movie
               </button>

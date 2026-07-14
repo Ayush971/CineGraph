@@ -60,7 +60,7 @@ const ListsPage: React.FC = () => {
         </p>
         <Link
           to="/login"
-          className="px-6 py-3 bg-primary hover:bg-red-700 text-white rounded-xl transition-colors"
+          className="px-6 py-3 bg-primary hover:bg-tungsten-500 hover:shadow-glow text-void rounded-xl transition-colors"
         >
           Log In
         </Link>
@@ -92,7 +92,7 @@ const ListsPage: React.FC = () => {
               setEditingList(null);
               setModalOpen(true);
             }}
-            className="px-5 py-3 bg-primary hover:bg-red-700 text-white rounded-xl transition-colors font-medium flex items-center gap-2"
+            className="px-5 py-3 bg-primary hover:bg-tungsten-500 hover:shadow-glow text-void rounded-xl transition-colors font-medium flex items-center gap-2"
           >
             <span className="text-lg">+</span> New List
           </button>
@@ -113,7 +113,7 @@ const ListsPage: React.FC = () => {
           </p>
           <button
             onClick={() => setModalOpen(true)}
-            className="px-6 py-3 bg-primary hover:bg-red-700 text-white rounded-xl transition-colors"
+            className="px-6 py-3 bg-primary hover:bg-tungsten-500 hover:shadow-glow text-void rounded-xl transition-colors"
           >
             Create Your First List
           </button>

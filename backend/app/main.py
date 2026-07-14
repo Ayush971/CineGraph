@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.config.database import engine, Base
-from app.routes import auth, movies, diary, lists, comments, social, likes, achievements, analytics
+from app.routes import auth, movies, diary, lists, comments, social, likes, achievements, analytics, recommendations
 import os
 from dotenv import load_dotenv
 
@@ -31,6 +31,8 @@ app.add_middleware(
         "http://localhost:5173",
         "http://127.0.0.1:5173",
     ],
+    # Dev convenience: allow any localhost port (preview servers, alt dev ports)
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -46,6 +48,7 @@ app.include_router(social.router)
 app.include_router(likes.router)
 app.include_router(achievements.router)
 app.include_router(analytics.router)
+app.include_router(recommendations.router)
 
 
 # Root endpoint
@@ -65,6 +68,7 @@ def read_root():
             "likes": "/likes",
             "achievements": "/achievements",
             "analytics": "/analytics",
+            "recommendations": "/recommendations",
         },
     }
 

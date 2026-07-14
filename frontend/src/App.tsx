@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
+import SmoothScroll from "./components/SmoothScroll";
 import LandingPage from "./pages/LandingPage";
 import MoviesHomePage from "./pages/MoviesHomePage";
 import SeriesHomePage from "./pages/SeriesHomePage";
@@ -17,11 +18,13 @@ import UserProfilePage from "./pages/UserProfilePage";
 import AchievementsPage from "./pages/AchievementsPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import YearInReviewPage from "./pages/YearInReviewPage";
+import RecommendationsPage from "./pages/RecommendationsPage";
 
 function App() {
   return (
     <Router>
       <AuthProvider>
+        <SmoothScroll />
         <AppContent />
       </AuthProvider>
     </Router>
@@ -63,6 +66,7 @@ function AppContent() {
               <Route path="/lists/:id" element={<ListDetailPage />} />
               <Route path="/feed" element={<ActivityFeedPage />} />
               <Route path="/user/:id" element={<UserProfilePage />} />
+              <Route path="/recommendations" element={<RecommendationsPage />} />
               <Route path="/achievements" element={<AchievementsPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/year-in-review" element={<YearInReviewPage />} />

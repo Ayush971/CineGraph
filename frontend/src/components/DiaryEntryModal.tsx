@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { diaryAPI } from '../services/api';
 import StarRating from './StarRating';
+import Button from './ui/Button';
 import type { DiaryEntryCreate, DiaryEntryUpdate } from '../types';
 
 interface DiaryEntryModalProps {
@@ -93,57 +95,69 @@ const DiaryEntryModal: React.FC<DiaryEntryModalProps> = ({
 
   if (!isOpen) return null;
 
+  const inputClasses =
+    'w-full px-4 py-3 bg-surface-3 border border-line rounded-md text-ink placeholder:text-ink-faint focus:outline-none focus:border-tungsten-400/60 focus:shadow-[var(--shadow-glow)] transition-[border-color,box-shadow] duration-150';
+
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-surface rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 bg-void/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="bg-surface-2 border border-line-strong rounded-2xl shadow-[var(--shadow-lift)] max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="sticky top-0 bg-surface border-b border-surface-light p-6 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">
-            {isEditing ? 'Edit Entry' : 'Log Movie'}
-          </h2>
+        <div className="sticky top-0 bg-surface-2/95 backdrop-blur-sm border-b border-line px-7 py-5 flex justify-between items-center z-10">
+          <div>
+            <p className="meta !text-tungsten-300 mb-1">Log Sheet</p>
+            <h2 className="font-display font-semibold text-xl">
+              {isEditing ? 'Edit Entry' : movieTitle}
+            </h2>
+          </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-2xl"
+            aria-label="Close"
+            className="w-9 h-9 flex items-center justify-center rounded-md text-ink-mute hover:text-ink hover:bg-surface-3 transition-colors cursor-pointer text-xl"
           >
             ×
           </button>
         </div>
 
         {/* Content */}
-        <form onSubmit={handleSubmit} className="p-6">
-          {/* Movie Title */}
-          <div className="mb-6">
-            <p className="text-lg font-semibold text-gray-300">
-              {movieTitle}
-            </p>
-          </div>
+        <form onSubmit={handleSubmit} className="p-7">
+          {isEditing && (
+            <p className="text-ink-mute font-medium mb-6">{movieTitle}</p>
+          )}
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded mb-4">
+            <div className="bg-danger/10 border border-danger/40 text-danger px-4 py-3 rounded-md mb-6 text-sm">
               {error}
             </div>
           )}
 
           {/* Watched Date */}
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">
-              Watched Date
-            </label>
+            <label className="meta block mb-2">Watched Date</label>
             <input
               type="date"
               value={watchedDate}
               onChange={(e) => setWatchedDate(e.target.value)}
               max={new Date().toISOString().split('T')[0]}
-              className="w-full px-4 py-3 bg-surface-light border border-gray-700 rounded focus:outline-none focus:border-primary transition-colors"
+              className={inputClasses}
               required
             />
           </div>
 
           {/* Rating */}
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">
-              Rating (Optional)
-            </label>
+            <label className="meta block mb-2">Rating · Optional</label>
             <StarRating
               rating={rating}
               maxRating={10}
@@ -155,7 +169,7 @@ const DiaryEntryModal: React.FC<DiaryEntryModalProps> = ({
               <button
                 type="button"
                 onClick={() => setRating(0)}
-                className="text-sm text-gray-400 hover:text-white mt-2"
+                className="text-sm text-ink-faint hover:text-ink mt-2 transition-colors cursor-pointer"
               >
                 Clear rating
               </button>
@@ -164,57 +178,47 @@ const DiaryEntryModal: React.FC<DiaryEntryModalProps> = ({
 
           {/* Review */}
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">
-              Review (Optional)
-            </label>
+            <label className="meta block mb-2">Review · Optional</label>
             <textarea
               value={review}
               onChange={(e) => setReview(e.target.value)}
-              placeholder="Share your thoughts about this movie..."
+              placeholder="Share your thoughts about this movie…"
               rows={5}
               maxLength={5000}
-              className="w-full px-4 py-3 bg-surface-light border border-gray-700 rounded focus:outline-none focus:border-primary transition-colors resize-none"
+              className={`${inputClasses} resize-none`}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              {review.length} / 5000 characters
+            <p className="meta !text-[0.65rem] !text-ink-faint mt-1.5">
+              {review.length} / 5000
             </p>
           </div>
 
           {/* Rewatch Checkbox */}
-          <div className="mb-6">
-            <label className="flex items-center gap-3 cursor-pointer">
+          <div className="mb-8">
+            <label className="flex items-center gap-3 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={isRewatch}
                 onChange={(e) => setIsRewatch(e.target.checked)}
-                className="w-5 h-5 bg-surface-light border-gray-700 rounded focus:ring-primary"
+                className="w-5 h-5 accent-[#FF7847] bg-surface-3 border-line rounded"
               />
-              <span className="text-sm">
+              <span className="text-sm text-ink-mute group-hover:text-ink transition-colors">
                 I've watched this before (rewatch)
               </span>
             </label>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 py-3 bg-primary text-white rounded font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Saving...' : isEditing ? 'Update Entry' : 'Save Entry'}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-3 bg-surface-light text-white rounded font-semibold hover:bg-gray-700 transition-colors"
-            >
+          <div className="flex gap-3">
+            <Button type="submit" disabled={loading} className="flex-1">
+              {loading ? 'Saving…' : isEditing ? 'Update Entry' : 'Save Entry'}
+            </Button>
+            <Button type="button" variant="secondary" onClick={onClose}>
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

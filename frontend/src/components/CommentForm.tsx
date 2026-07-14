@@ -86,7 +86,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
               <button
                 type="submit"
                 disabled={!content.trim() || submitting}
-                className="px-4 py-1.5 bg-primary hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                className="px-4 py-1.5 bg-primary hover:bg-tungsten-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {submitting ? "Posting..." : buttonText}
               </button>

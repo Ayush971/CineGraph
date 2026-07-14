@@ -61,6 +61,14 @@ class TMDBService:
         """Get cast and crew for a movie"""
         return self._make_request(f"movie/{movie_id}/credits")
 
+    def get_recommendations(self, movie_id: int, page: int = 1) -> Dict:
+        """Get TMDB recommendations for a movie"""
+        return self._make_request(f"movie/{movie_id}/recommendations", {"page": page})
+
+    def get_similar(self, movie_id: int, page: int = 1) -> Dict:
+        """Get movies similar to a given movie"""
+        return self._make_request(f"movie/{movie_id}/similar", {"page": page})
+
     def get_watch_providers(self, movie_id: int) -> Dict:
         """Get watch providers for a movie"""
         return self._make_request(f"movie/{movie_id}/watch/providers")

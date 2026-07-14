@@ -352,6 +352,22 @@ export interface AnalyticsOverview {
   total_movies: number;
 }
 
+// ==================== RECOMMENDATIONS ====================
+
+export interface Recommendation {
+  tmdb_id: number;
+  title: string;
+  poster_path?: string;
+  release_date?: string;
+  vote_average?: number;
+  score: number;
+  reason?: string;
+}
+
+export interface RecommendationResponse {
+  items: Recommendation[];
+}
+
 export interface YearInReview {
   year: number;
   total_movies: number;

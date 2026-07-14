@@ -165,7 +165,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               <button
                 onClick={handleEdit}
                 disabled={saving}
-                className="px-3 py-1 text-xs bg-primary hover:bg-red-700 text-white rounded-md transition-colors disabled:opacity-50"
+                className="px-3 py-1 text-xs bg-primary hover:bg-tungsten-500 hover:shadow-glow text-void rounded-md transition-colors disabled:opacity-50"
               >
                 {saving ? "Saving..." : "Save"}
               </button>

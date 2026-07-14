@@ -98,7 +98,7 @@ const RegisterPage: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-primary text-white rounded font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-primary text-white rounded font-semibold hover:bg-tungsten-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Creating account...' : 'Sign Up'}
           </button>

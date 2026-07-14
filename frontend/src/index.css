@@ -7,38 +7,182 @@ body,
   width: 100%;
 }
 
+/* ============================================================
+   CineGraph Design Language — "PROJECTION"
+   Tungsten acts. Daylight navigates. Posters are the light.
+   ============================================================ */
+
 @theme {
-  --color-primary: #e50914;
-  /* --color-background: #0a0a0a; */
-  /* --color-surface: #1a1a1a; */
-  --color-surface-light: #2a2a2a;
+  /* ---- Surfaces: the dark neutral room ---- */
+  --color-void: #0b0a0a; /* page background */
+  --color-surface: #131212; /* cards, nav */
+  --color-surface-2: #1c1a19; /* raised: modals, hover */
+  --color-surface-3: #262322; /* highest: popovers, inputs */
+
+  /* legacy aliases — existing bg-background / bg-surface-light keep working */
+  --color-background: #0b0a0a;
+  --color-surface-light: #1c1a19;
+
+  /* ---- Lines ---- */
+  --color-line: rgb(244 241 236 / 0.08);
+  --color-line-strong: rgb(244 241 236 / 0.16);
+
+  /* ---- Text: projected light ---- */
+  --color-ink: #f4f1ec;
+  --color-ink-mute: #a8a29a;
+  --color-ink-faint: #6f6a63;
+
+  /* ---- TUNGSTEN: act (electric coral-orange) ---- */
+  --color-tungsten-300: #ffa07a;
+  --color-tungsten-400: #ff7847;
+  --color-tungsten-500: #f55e28;
+  --color-tungsten-600: #d0481a;
+  --color-primary: #ff7847; /* re-points all existing bg/text-primary */
+
+  /* ---- DAYLIGHT: navigate (electric teal-cyan) ---- */
+  --color-daylight-300: #7df0df;
+  --color-daylight-400: #2dd9c6;
+  --color-daylight-500: #17b3a3;
+  --color-daylight-600: #0e8a7e;
+
+  /* ---- Functional ---- */
+  --color-danger: #e5484d;
+  --color-success: #6fbf73;
+
+  /* ---- Ambient (poster-extracted per movie page) ---- */
+  --color-ambient: #1c1a19;
+
+  /* ---- Fonts ---- */
+  --font-display: "Bricolage Grotesque Variable", system-ui, sans-serif;
+  --font-sans: "Instrument Sans Variable", system-ui, sans-serif;
+  --font-mono: "Spline Sans Mono Variable", ui-monospace, monospace;
+
+  /* ---- Radii ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-poster: 10px;
+
+  /* ---- Shadows & glow ---- */
+  --shadow-card: 0 2px 8px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.35);
+  --shadow-lift: 0 4px 16px rgb(0 0 0 / 0.5), 0 24px 48px rgb(0 0 0 / 0.45);
+  --shadow-glow: 0 0 0 1px rgb(255 120 71 / 0.35),
+    0 4px 24px rgb(255 120 71 / 0.18);
+  --shadow-glow-cool: 0 0 0 1px rgb(45 217 198 / 0.3),
+    0 4px 24px rgb(45 217 198 / 0.15);
+
+  /* ---- Motion ---- */
+  --ease-reel: cubic-bezier(0.22, 1, 0.36, 1);
 
   --animate-scroll-horizontal: scroll-horizontal 60s linear infinite;
 }
 
-:root {
-  --background: 15 23 42;
-}
-
+/* ---- Base ---- */
 body {
-  background-color: rgb(var(--background));
-  color: white;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  background-color: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+h1,
+h2 {
+  font-family: var(--font-display);
 }
 
-/* Hide scrollbar but keep functionality */
+code {
+  font-family: var(--font-mono);
+}
+
+/* ---- The slate: metadata style (years, runtimes, ratings, labels) ---- */
+.meta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-mute);
+}
+
+/* ---- Film grain overlay ---- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 8s steps(10) infinite;
+}
+
+@keyframes grain {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-2%, 2%);
+  }
+  40% {
+    transform: translate(2%, -1%);
+  }
+  60% {
+    transform: translate(-1%, 1%);
+  }
+  80% {
+    transform: translate(1%, -2%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    animation: none;
+  }
+}
+
+/* ---- Focus: daylight beam (wayfinding) ---- */
+:focus-visible {
+  outline: 2px solid var(--color-daylight-400);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---- Selection: tungsten ---- */
+::selection {
+  background: rgb(255 120 71 / 0.3);
+}
+
+/* ---- Skeleton shimmer ---- */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--color-surface-2) 40%,
+    var(--color-surface-3) 50%,
+    var(--color-surface-2) 60%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
+  }
+}
+
+/* ---- Hide scrollbar but keep functionality ---- */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -48,16 +192,16 @@ code {
   scrollbar-width: none;
 }
 
-/* Horizontal scroll animation */
+/* ---- Horizontal scroll animation (landing poster strip) ---- */
 @keyframes scroll-horizontal {
   0% {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-25%); /* Move by 1 image width (1/4 of container) */
+    transform: translateX(-25%);
   }
 }
 
 .animate-scroll-horizontal {
-  animation: scroll-horizontal 20s linear infinite; /* Faster speed for smooth look */
+  animation: scroll-horizontal 20s linear infinite;
 }

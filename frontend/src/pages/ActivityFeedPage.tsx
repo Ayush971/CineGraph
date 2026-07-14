@@ -78,7 +78,7 @@ const ActivityFeedPage: React.FC = () => {
         </p>
         <Link
           to="/login"
-          className="px-6 py-2.5 bg-primary hover:bg-red-700 text-white rounded-xl transition-colors font-medium"
+          className="px-6 py-2.5 bg-primary hover:bg-tungsten-500 hover:shadow-glow text-void rounded-xl transition-colors font-medium"
         >
           Log In
         </Link>

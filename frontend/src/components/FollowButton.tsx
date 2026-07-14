@@ -45,7 +45,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       className={`px-5 py-2 rounded-full font-medium text-sm transition-all duration-200 ${
         following
           ? "bg-white/10 text-white border border-white/20 hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-400"
-          : "bg-primary hover:bg-red-700 text-white"
+          : "bg-primary hover:bg-tungsten-500 hover:shadow-glow text-void"
       } disabled:opacity-50`}
     >
       {loading ? (

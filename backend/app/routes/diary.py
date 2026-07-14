@@ -15,6 +15,7 @@ from app.schemas.diary import (
 )
 from app.utils.dependencies import get_current_user
 from app.services.achievement_engine import check_achievements
+from app.services.recommendation_engine import invalidate_recommendations
 
 router = APIRouter(prefix="/diary", tags=["Diary"])
 
@@ -54,6 +55,12 @@ def create_diary_entry(
         check_achievements(current_user.id, db)
     except Exception:
         pass  # Don't fail diary entry creation if achievement check fails
+
+    # New watch changes taste — drop cached recommendations so they recompute.
+    try:
+        invalidate_recommendations(current_user.id)
+    except Exception:
+        pass
     
     # Prepare response with movie details
     response = DiaryEntryResponse(

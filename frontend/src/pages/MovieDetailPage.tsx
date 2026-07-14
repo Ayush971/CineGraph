@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { moviesAPI, diaryAPI } from "../services/api";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { moviesAPI, diaryAPI, API_BASE_URL } from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import { useAmbientColor } from "../hooks/useAmbientColor";
 import LoadingSpinner from "../components/LoadingSpinner";
 import StarRating from "../components/StarRating";
 import CastList from "../components/CastList";
@@ -9,9 +11,23 @@ import CrewList from "../components/CrewList";
 import OTTSection from "../components/OTTSection";
 import DiaryEntryModal from "../components/DiaryEntryModal";
 import CommentSection from "../components/CommentSection";
-import type { MovieDetail, MovieLogStatus } from "../types";
+import MovieCard from "../components/MovieCard";
+import Button from "../components/ui/Button";
+import Badge from "../components/ui/Badge";
+import type { MovieDetail, MovieLogStatus, Movie } from "../types";
 
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
+
+/** Slate-style section header: mono scene label + display title */
+const SectionSlate: React.FC<{ label: string; title: string }> = ({
+  label,
+  title,
+}) => (
+  <div className="mb-6">
+    <p className="meta !text-tungsten-300 mb-1.5">{label}</p>
+    <h2 className="font-display font-semibold text-2xl">{title}</h2>
+  </div>
+);
 
 const MovieDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,11 +36,23 @@ const MovieDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [userRating, setUserRating] = useState<number>(0);
+  const [recommendations, setRecommendations] = useState<Movie[]>([]);
 
   // Diary State
   const [logStatus, setLogStatus] = useState<MovieLogStatus | null>(null);
   const [showLogModal, setShowLogModal] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<any>(null);
+
+  // Ambient: sample the poster through the CORS-clean proxy
+  const ambient = useAmbientColor(
+    movie?.poster_path
+      ? `${API_BASE_URL}/movies/poster-img/w92/${movie.poster_path.replace("/", "")}`
+      : null
+  );
+
+  // Parallax backdrop
+  const { scrollY } = useScroll();
+  const backdropY = useTransform(scrollY, [0, 600], [0, 160]);
 
   const fetchData = async () => {
     if (!id) return;
@@ -34,6 +62,12 @@ const MovieDetailPage: React.FC = () => {
       // Fetch movie details
       const movieRes = await moviesAPI.getDetails(Number(id));
       setMovie(movieRes.data);
+
+      // Fetch related films (non-blocking — failure shouldn't break the page)
+      moviesAPI
+        .getRecommendations(Number(id))
+        .then((res) => setRecommendations(res.data.results as Movie[]))
+        .catch(() => setRecommendations([]));
 
       // Fetch log status if user is logged in
       if (user) {
@@ -54,6 +88,7 @@ const MovieDetailPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, user]);
 
   const handleLogSuccess = () => {
@@ -96,14 +131,16 @@ const MovieDetailPage: React.FC = () => {
 
   if (error || !movie) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-red-500 text-xl">{error || "Movie not found"}</p>
+      <div className="flex flex-col justify-center items-center min-h-[60vh] gap-3">
+        <p className="meta !text-danger">Reel Missing</p>
+        <p className="text-ink-mute text-lg">{error || "Movie not found"}</p>
       </div>
     );
   }
 
+  // w1280 is visually identical in a 44vh hero and several MB lighter than /original
   const backdropUrl = movie.backdrop_path
-    ? `${TMDB_IMAGE_BASE}/original${movie.backdrop_path}`
+    ? `${TMDB_IMAGE_BASE}/w1280${movie.backdrop_path}`
     : null;
 
   const posterUrl = movie.poster_path
@@ -115,166 +152,200 @@ const MovieDetailPage: React.FC = () => {
     : "TBA";
 
   return (
-    <div className="min-h-screen relative">
-      {/* Backdrop Image */}
-      {backdropUrl && (
-        <div
-          className="absolute top-0 left-0 right-0 h-[600px] bg-cover bg-center opacity-30"
-          style={{ backgroundImage: `url(${backdropUrl})` }}
-        />
-      )}
-
-      {/* Content */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Poster */}
-          <div className="shrink-0">
+    <div
+      className="min-h-screen"
+      style={
+        ambient
+          ? ({ "--color-ambient": ambient } as React.CSSProperties)
+          : undefined
+      }
+    >
+      {/* ====================== Parallax backdrop ====================== */}
+      <div className="relative h-[44vh] min-h-[320px] -mb-44 overflow-hidden">
+        {backdropUrl ? (
+          <motion.div
+            style={{ y: backdropY }}
+            className="absolute inset-0 scale-110"
+          >
             <img
-              src={posterUrl}
-              alt={movie.title}
-              className="w-full md:w-80 rounded-lg shadow-2xl"
+              src={backdropUrl}
+              alt=""
+              className="w-full h-full object-cover object-top"
+              aria-hidden="true"
             />
+          </motion.div>
+        ) : (
+          <div className="absolute inset-0 bg-[var(--color-ambient)]" />
+        )}
+        {/* Ambient tint — the room takes the film's color */}
+        <div
+          className="absolute inset-0 mix-blend-multiply"
+          style={{
+            background:
+              "linear-gradient(180deg, transparent 0%, var(--color-ambient) 100%)",
+          }}
+        />
+        {/* Fade into the void */}
+        <div className="absolute inset-0 bg-gradient-to-b from-void/40 via-void/30 to-void" />
+      </div>
+
+      {/* ========================== Content ========================== */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="flex flex-col md:flex-row gap-10">
+          {/* ---- Poster + actions column ---- */}
+          <div className="shrink-0 w-64 mx-auto md:w-72 md:mx-0">
+            <div className="relative">
+              {/* Ambient glow behind the poster */}
+              <div
+                className="absolute -inset-4 rounded-[24px] blur-2xl opacity-50"
+                style={{ background: "var(--color-ambient)" }}
+                aria-hidden="true"
+              />
+              <motion.img
+                layoutId={`poster-${movie.id}`}
+                src={posterUrl}
+                alt={movie.title}
+                className="relative w-full rounded-[10px] shadow-[var(--shadow-lift)] ring-1 ring-line-strong"
+              />
+            </div>
+
+            {/* Log action */}
+            {user && (
+              <Button
+                size="lg"
+                magnetic
+                className="w-full mt-6"
+                onClick={() => {
+                  setSelectedEntry(null); // Clear selection for new entry
+                  setShowLogModal(true);
+                }}
+              >
+                {logStatus?.logged ? "Log Another Watch" : "Log This Film"}
+              </Button>
+            )}
+
+            {/* Where to watch */}
+            <div className="mt-6">{id && <OTTSection movieId={Number(id)} />}</div>
           </div>
 
-          {/* Details */}
-          <div className="flex-1">
-            <div className="flex justify-between items-start gap-4 mb-6">
-              <div className="flex-1">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                  {movie.title}
-                </h1>
+          {/* ---- Info column ---- */}
+          <div className="flex-1 md:pt-32">
+            {/* Slate line */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="meta !text-ink-mute mb-3"
+            >
+              {year}
+              {movie.runtime ? ` · ${movie.runtime} MIN` : ""}
+              {movie.vote_average
+                ? ` · TMDB ${movie.vote_average.toFixed(1)}`
+                : ""}
+            </motion.p>
 
-                <div className="flex flex-wrap items-center gap-4 text-gray-400 mb-6">
-                  <span>{year}</span>
-                  {movie.runtime && <span>• {movie.runtime} min</span>}
-                </div>
-
-                {/* Rating Section */}
-                <div className="mb-6">
-                  <div className="flex flex-col gap-3">
-                    {/* Official Rating */}
-                    {movie.vote_average && (
-                      <div>
-                        <p className="text-sm text-gray-400 mb-2">
-                          Official Rating
-                        </p>
-                        <StarRating
-                          rating={movie.vote_average}
-                          maxRating={10}
-                          size="large"
-                          interactive={false}
-                        />
-                      </div>
-                    )}
-
-                    {/* User Rating */}
-                    <div>
-                      <p className="text-sm text-gray-400 mb-2">Your Rating</p>
-                      <div
-                        onClick={() => !user && alert("Please login to rate")}
-                      >
-                        <StarRating
-                          rating={userRating}
-                          maxRating={10}
-                          size="large"
-                          interactive={!!user}
-                          onRate={handleRating}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* OTT Platforms & Log Button */}
-              <div className="shrink-0 max-w-[300px] flex flex-col gap-4">
-                {id && <OTTSection movieId={Number(id)} />}
-
-                {/* Log Button */}
-                {user && (
-                  <button
-                    onClick={() => {
-                      setSelectedEntry(null); // Clear selection for new entry
-                      setShowLogModal(true);
-                    }}
-                    className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg"
-                  >
-                    <span>📝</span>
-                    {logStatus?.logged ? "Log Another Watch" : "Log Movie"}
-                  </button>
-                )}
-              </div>
-            </div>
+            {/* Title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="font-display font-bold text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.05] tracking-[-0.015em] mb-5"
+            >
+              {movie.title}
+            </motion.h1>
 
             {/* Genres */}
             {movie.genres && movie.genres.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div className="flex flex-wrap gap-2 mb-8">
                 {movie.genres.map((genre) => (
-                  <span
-                    key={genre.id}
-                    className="px-4 py-2 bg-surface-light rounded-full text-sm"
-                  >
+                  <Badge key={genre.id} variant="genre">
                     {genre.name}
-                  </span>
+                  </Badge>
                 ))}
               </div>
             )}
 
+            {/* Ratings */}
+            <div className="flex flex-col sm:flex-row gap-8 mb-8 p-5 bg-surface/70 border border-line rounded-2xl backdrop-blur-sm">
+              {movie.vote_average ? (
+                <div>
+                  <p className="meta mb-2">Official Rating</p>
+                  <StarRating
+                    rating={movie.vote_average}
+                    maxRating={10}
+                    size="medium"
+                    interactive={false}
+                  />
+                </div>
+              ) : null}
+
+              <div>
+                <p className="meta mb-2">Your Rating</p>
+                <div onClick={() => !user && alert("Please login to rate")}>
+                  <StarRating
+                    rating={userRating}
+                    maxRating={10}
+                    size="medium"
+                    interactive={!!user}
+                    onRate={handleRating}
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Overview */}
             {movie.overview && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold mb-3">Overview</h2>
-                <p className="text-gray-300 text-lg leading-relaxed">
+              <div className="mb-10">
+                <p className="meta mb-2">Synopsis</p>
+                <p className="text-ink-mute text-lg leading-relaxed max-w-3xl">
                   {movie.overview}
                 </p>
               </div>
             )}
 
-            {/* Your Logs Section */}
+            {/* Your Activity */}
             {user && logStatus && logStatus.entries.length > 0 && (
-              <div className="mb-8 p-6 bg-surface-light/50 rounded-xl border border-white/5">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold">Your Activity</h2>
-                  <div className="text-sm text-gray-400">
+              <div className="mb-8">
+                <div className="flex justify-between items-end mb-5">
+                  <SectionSlate label="Log Sheet" title="Your Activity" />
+                  <span className="meta mb-6">
                     {logStatus.entries.length}{" "}
-                    {logStatus.entries.length === 1 ? "entry" : "entries"}
-                  </div>
+                    {logStatus.entries.length === 1 ? "Entry" : "Entries"}
+                  </span>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3 -mt-4">
                   {logStatus.entries.map((entry) => (
                     <div
                       key={entry.id}
-                      className="bg-surface p-4 rounded-lg flex flex-col gap-3 border border-white/5"
+                      className="bg-surface border border-line rounded-xl p-4 flex flex-col gap-3 hover:border-line-strong transition-colors"
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-3">
-                          <span className="text-gray-400 text-sm">
+                          <span className="meta !text-ink">
                             {new Date(entry.watched_date).toLocaleDateString(
                               undefined,
                               {
                                 year: "numeric",
-                                month: "long",
+                                month: "short",
                                 day: "numeric",
                               }
                             )}
                           </span>
                           {entry.is_rewatch && (
-                            <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
-                              Rewatch
-                            </span>
+                            <Badge variant="daylight">Rewatch</Badge>
                           )}
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <button
                             onClick={() => handleEditEntry(entry)}
-                            className="text-gray-400 hover:text-white text-sm"
+                            className="px-2.5 py-1 text-xs rounded-md text-ink-mute hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => handleDeleteEntry(entry.id)}
-                            className="text-gray-400 hover:text-red-400 text-sm"
+                            className="px-2.5 py-1 text-xs rounded-md text-ink-mute hover:text-danger hover:bg-danger/10 transition-colors cursor-pointer"
                           >
                             Delete
                           </button>
@@ -283,19 +354,17 @@ const MovieDetailPage: React.FC = () => {
 
                       {/* User's Rating for this entry */}
                       {entry.rating && (
-                        <div className="flex items-center gap-1">
-                          <StarRating
-                            rating={entry.rating}
-                            maxRating={10}
-                            size="small"
-                            interactive={false}
-                          />
-                        </div>
+                        <StarRating
+                          rating={entry.rating}
+                          maxRating={10}
+                          size="small"
+                          interactive={false}
+                        />
                       )}
 
                       {/* User's Review */}
                       {entry.review && (
-                        <p className="text-gray-300 italic text-sm border-l-2 border-gray-600 pl-3">
+                        <p className="text-ink-mute italic text-sm border-l-2 border-tungsten-400/40 pl-3">
                           "{entry.review}"
                         </p>
                       )}
@@ -315,6 +384,20 @@ const MovieDetailPage: React.FC = () => {
 
         {/* Comments / Discussion Section */}
         {id && <CommentSection movieTmdbId={Number(id)} />}
+
+        {/* Related Films */}
+        {recommendations.length > 0 && (
+          <div className="mt-14">
+            <SectionSlate label="Double Feature" title="Related Films" />
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              {recommendations.map((rec) => (
+                <div key={rec.id} className="shrink-0 w-36">
+                  <MovieCard movie={rec} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Diary Modal */}
