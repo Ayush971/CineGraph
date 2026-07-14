@@ -6,8 +6,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Database URL
-DATABASE_URL = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+# Database URL — accepts a single DATABASE_URL (cloud providers like Neon)
+# or falls back to individual DB_* vars (local Docker dev)
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    f"postgresql://{os.getenv('DB_USER', 'cinegraph_user')}:{os.getenv('DB_PASSWORD', 'cinegraph_password')}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'cinegraph_db')}"
+)
 
 # Create engine
 engine = create_engine(DATABASE_URL)
