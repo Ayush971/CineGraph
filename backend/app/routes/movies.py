@@ -92,7 +92,9 @@ def poster_image(size: str, file_name: str):
     return Response(
         content=content,
         media_type=media_type,
-        headers={"Cache-Control": "public, max-age=86400"},
+        # TMDB poster filenames are content-addressed and never change, so this
+        # can be cached hard — repeat visits then skip the proxy entirely.
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
     )
 
 

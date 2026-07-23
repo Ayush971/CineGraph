@@ -1,9 +1,15 @@
 @import "tailwindcss";
 
+/* NOTE: html/body must NOT be locked to height:100% — Lenis reads the document
+   height to compute its scroll limit, and a fixed viewport height makes it stop
+   scrolling before the real bottom of long pages. */
 html,
-body,
+body {
+  min-height: 100%;
+  width: 100%;
+}
+
 #root {
-  height: 100%;
   width: 100%;
 }
 

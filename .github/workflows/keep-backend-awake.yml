@@ -1,0 +1,27 @@
+name: Keep backend awake
+
+# Render's free tier sleeps a service after 15 minutes of inactivity, and the
+# cold start costs ~30s — which the landing page waits on before it can show
+# any posters. Pinging /health every 10 minutes keeps it warm.
+#
+# Note: this keeps the service running ~730 h/month, just inside Render's free
+# 750 instance-hours. If you add a second free service, disable this or upgrade.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 90 \
+            https://cinegraph-api-48a2.onrender.com/health)
+          echo "Health check returned $code"
+          # Don't fail the workflow on a slow cold start — the ping still woke it.
+          if [ "$code" != "200" ]; then
+            echo "::warning::Non-200 response ($code); service may have been cold."
+          fi

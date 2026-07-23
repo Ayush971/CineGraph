@@ -19,6 +19,27 @@ Approved decisions: Bricolage Grotesque display · electric Tungsten/Daylight du
 
 ---
 
+## 1a. The logo — "the projector"
+
+A tungsten lamp throwing a daylight beam of three diverging rays. It reads as a
+projector *and* a play button — the two most universal "moving pictures" symbols
+fused. Deliberately avoids the film-reel / clapperboard / popcorn clichés.
+
+**The duo is the primary mark:** a warm tungsten lamp casting a cool daylight beam
+is literally the palette's own story (the two film white-balance standards), so
+the logo encodes the brand rather than just wearing its colors.
+
+Implementation: `frontend/src/components/ui/ProjectorMark.tsx`
+- `variant`: `duo` (default/primary) · `primary` (all tungsten) · `mono` (inherits
+  `currentColor` — use for single-color print, embroidery, watermarks)
+- `size` in px; `animated` softly pulses the rays (landing hero only)
+- Favicon: `frontend/public/favicon.svg` — same mark on a `--color-void` rounded
+  square so it holds contrast on light browser tab bars.
+
+Rules: never recolor outside the three variants; never add an outline or shadow;
+keep the lamp-to-beam gap intact (it's what makes it read as projected light);
+minimum size 16px.
+
 ## 2. Typography
 
 **Display / brand voice: Bricolage Grotesque** (variable)

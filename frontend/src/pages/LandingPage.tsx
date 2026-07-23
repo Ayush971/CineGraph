@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { moviesAPI, API_BASE_URL } from "../services/api";
 import Button from "../components/ui/Button";
+import ProjectorMark from "../components/ui/ProjectorMark";
 import type { Movie } from "../types";
 
 // three.js is code-split — only fetched when the 3D wall actually mounts
@@ -60,6 +61,7 @@ const LandingPage: React.FC = () => {
   const { user } = useAuth();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [use3D] = useState(canRun3D);
+  const [ready3D, setReady3D] = useState(false);
 
   useEffect(() => {
     moviesAPI
@@ -77,16 +79,30 @@ const LandingPage: React.FC = () => {
 
   // WebGL textures need CORS-clean images; TMDB's CDN sends no CORS headers,
   // so the 3D wall loads posters through our backend proxy instead.
+  // Kept to 12 at w185: each one is a round trip through our own server, so
+  // fewer + smaller is a large win on the first (cold) visit.
   const textureUrls = useMemo(
     () =>
       movies
-        .slice(0, 24)
+        .slice(0, 12)
         .map(
           (m) =>
-            `${API_BASE_URL}/movies/poster-img/w342/${m.poster_path!.replace("/", "")}`
+            `${API_BASE_URL}/movies/poster-img/w185/${m.poster_path!.replace("/", "")}`
         ),
     [movies]
   );
+
+  // Don't let the 3D wall compete with first paint — mount it once the browser
+  // is idle. (The backend can be slow to wake, so posters may arrive late too.)
+  useEffect(() => {
+    if (!use3D) return;
+    const cb = () => setReady3D(true);
+    // The `timeout` guarantees it still runs if the browser never goes idle.
+    const id = window.requestIdleCallback
+      ? window.requestIdleCallback(cb, { timeout: 1500 })
+      : window.setTimeout(cb, 600);
+    return () => window.cancelIdleCallback?.(id as number);
+  }, [use3D]);
 
   const tickerTitles = useMemo(
     () => movies.slice(0, 10).map((m) => m.title),
@@ -99,11 +115,8 @@ const LandingPage: React.FC = () => {
       <section className="relative h-screen min-h-[640px] flex flex-col overflow-hidden">
         {/* -- Letterbox top bar -- */}
         <div className="relative z-30 flex items-center justify-between px-5 sm:px-8 py-4 bg-void/90 border-b border-line">
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-tungsten-400 opacity-60 animate-ping motion-reduce:animate-none" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-tungsten-400" />
-            </span>
+          <div className="flex items-center gap-2.5">
+            <ProjectorMark size={24} animated />
             <span className="font-display text-lg font-bold tracking-tight">
               CineGraph
             </span>
@@ -137,6 +150,18 @@ const LandingPage: React.FC = () => {
 
         {/* -- The frame: poster wall / fallback collage -- */}
         <div className="relative flex-1">
+          {/* Instant backdrop — a projector beam in pure CSS. Renders on the
+              first frame so the hero never looks empty while posters load
+              (the API can be slow to wake on a cold backend). */}
+          <div
+            className="absolute inset-0"
+            aria-hidden="true"
+            style={{
+              background:
+                "radial-gradient(70% 55% at 18% 45%, rgb(255 120 71 / 0.16), transparent 70%), radial-gradient(60% 50% at 78% 60%, rgb(45 217 198 / 0.10), transparent 70%), linear-gradient(115deg, #0B0A0A 30%, #17130F 60%, #0B0A0A 100%)",
+            }}
+          />
+
           {/* Fallback collage — always mounted; the 3D canvas fades in above it */}
           {posterUrls.length > 0 && (
             <div
@@ -161,8 +186,8 @@ const LandingPage: React.FC = () => {
             </div>
           )}
 
-          {/* 3D reel (desktop only) */}
-          {use3D && textureUrls.length > 0 && (
+          {/* 3D reel (desktop only, after idle) */}
+          {use3D && ready3D && textureUrls.length > 0 && (
             <Suspense fallback={null}>
               <PosterWall3D posterUrls={textureUrls} />
             </Suspense>

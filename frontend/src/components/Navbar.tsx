@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import SearchBar from "./SearchBar";
+import ProjectorMark from "./ui/ProjectorMark";
 
 interface NavItem {
   to: string;
@@ -30,16 +31,13 @@ const Navbar: React.FC = () => {
     <nav className="bg-surface/80 backdrop-blur-xl border-b border-line sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 gap-4">
-          {/* Wordmark — REC dot + Bricolage */}
+          {/* Wordmark — projector mark + Bricolage */}
           <Link
             to="/"
-            className="flex items-center gap-2 shrink-0 group"
+            className="flex items-center gap-2.5 shrink-0 group"
             aria-label="CineGraph home"
           >
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-tungsten-400 opacity-60 animate-ping motion-reduce:animate-none" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-tungsten-400" />
-            </span>
+            <ProjectorMark size={26} />
             <span className="font-display text-xl font-bold tracking-tight text-ink group-hover:text-tungsten-300 transition-colors">
               CineGraph
             </span>
