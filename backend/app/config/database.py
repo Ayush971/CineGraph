@@ -18,8 +18,18 @@ DATABASE_URL = os.getenv(
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-# Create engine (pre_ping recycles dead connections dropped by cloud DBs)
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+# Create engine.
+#  - pool_pre_ping recycles dead connections dropped by cloud DBs
+#  - connect_timeout is essential: without it, an unreachable database makes
+#    psycopg2 hang indefinitely instead of raising. At import time that means
+#    the app never finishes booting, never binds a port, and every request
+#    hangs until the platform times it out — a total outage caused by what
+#    should be a recoverable DB blip.
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    connect_args={"connect_timeout": 10},
+)
 
 # Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

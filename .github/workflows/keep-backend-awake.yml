@@ -2,10 +2,11 @@ name: Keep backend awake
 
 # Render's free tier sleeps a service after 15 minutes of inactivity, and the
 # cold start costs ~30s — which the landing page waits on before it can show
-# any posters. Pinging /health every 10 minutes keeps it warm.
+# any posters. Pinging /health keeps it warm.
 #
-# Note: this keeps the service running ~730 h/month, just inside Render's free
-# 750 instance-hours. If you add a second free service, disable this or upgrade.
+# Note: GitHub throttles scheduled workflows on free/inactive repos, so this
+# fires far less often than the cron asks for (expect roughly hourly, not every
+# 10 min). That's fine — it still trims most cold starts.
 
 on:
   schedule:
@@ -18,10 +19,17 @@ jobs:
     steps:
       - name: Ping health endpoint
         run: |
+          # `|| true` matters: GitHub runs this with `set -e`, so a curl timeout
+          # (exit 28) would otherwise kill the step before we can report on it.
           code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 90 \
-            https://cinegraph-api-48a2.onrender.com/health)
-          echo "Health check returned $code"
-          # Don't fail the workflow on a slow cold start — the ping still woke it.
-          if [ "$code" != "200" ]; then
-            echo "::warning::Non-200 response ($code); service may have been cold."
+            https://cinegraph-api-48a2.onrender.com/health || true)
+
+          if [ "$code" = "200" ]; then
+            echo "Backend is awake (200)."
+          elif [ "$code" = "000" ]; then
+            echo "::warning::No response within 90s — the service may be crash-looping or suspended. Check Render logs."
+          else
+            echo "::warning::Unexpected status $code from /health."
           fi
+          # Always succeed: this is a keep-warm ping, not a health gate. A red X
+          # here every 10 minutes is noise, not signal.

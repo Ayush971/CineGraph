@@ -13,8 +13,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+# Create database tables.
+# Deliberately non-fatal: if the database is briefly unreachable at boot (a
+# cloud DB still waking, a transient network blip), we must NOT crash the
+# process — that turns a temporary DB problem into a crash-loop where the
+# whole API is unreachable and /health can't even report why.
+try:
+    Base.metadata.create_all(bind=engine)
+    DB_INIT_ERROR = None
+except Exception as exc:  # pragma: no cover - startup path
+    DB_INIT_ERROR = str(exc)
+    print(f"[startup] WARNING: could not initialize database tables: {exc}")
 
 # Initialize FastAPI
 app = FastAPI(
@@ -75,10 +84,29 @@ def read_root():
     }
 
 
-# Health check
+# Health check — actually probes the database and cache rather than assuming.
 @app.get("/health")
 def health_check():
-    return {"status": "OK", "database": "Connected"}
+    from sqlalchemy import text
+    from app.config.redis import get_redis
+
+    db_status = "connected"
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+    except Exception as exc:
+        db_status = f"error: {exc}"
+
+    # Redis is optional — the app degrades gracefully without it.
+    redis_status = "connected" if get_redis() else "unavailable"
+
+    healthy = db_status == "connected"
+    return {
+        "status": "OK" if healthy else "DEGRADED",
+        "database": db_status,
+        "redis": redis_status,
+        "startup_db_error": DB_INIT_ERROR,
+    }
 
 
 if __name__ == "__main__":
