@@ -12,10 +12,13 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
+      # Postgres is hosted on Neon, not Render — Render's free databases are
+      # deleted after a short trial period, which already cost us one database.
+      # `sync: false` means Render keeps whatever is set in the dashboard and
+      # never overwrites it on deploy. Paste the Neon connection string there
+      # (it must include ?sslmode=require).
       - key: DATABASE_URL
-        fromDatabase:
-          name: cinegraph-db
-          property: connectionString
+        sync: false
       - key: REDIS_URL
         fromService:
           type: redis
@@ -43,6 +46,7 @@ services:
     ipAllowList: [] # empty = reachable only from your Render services
 
 # ---- PostgreSQL ----
-databases:
-  - name: cinegraph-db
-    plan: free # NOTE: Render deletes free databases after 90 days
+# Deliberately NOT declared here. Render's free Postgres is deleted after a
+# short trial period (we lost one that way), so the database lives on Neon,
+# whose free tier does not expire. It is wired in through the DATABASE_URL
+# environment variable above.

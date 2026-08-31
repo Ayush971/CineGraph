@@ -20,6 +20,12 @@ yarn-error.log
 *.swp
 *.swo
 
+# Database dumps — these contain real user emails and password hashes.
+# Never commit them.
+backups/
+*.sql
+*.dump
+
 # OS
 .DS_Store
 Thumbs.db
