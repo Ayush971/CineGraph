@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import type { CastMember } from "../types";
 
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
@@ -81,31 +82,37 @@ const CastList: React.FC<CastListProps> = ({ cast }) => {
         >
           <div className="flex gap-3" style={{ width: "max-content" }}>
             {displayedCast.map((actor) => (
-              <div key={actor.id} className="w-28 shrink-0">
+              <Link
+                to={`/person/${actor.id}`}
+                key={actor.id}
+                className="w-28 shrink-0 group/person"
+              >
                 {actor.profile_path ? (
                   <img
                     src={`${TMDB_IMAGE_BASE}/w185${actor.profile_path}`}
                     alt={actor.name}
-                    className="w-full h-40 object-cover rounded-md mb-2"
+                    className="w-full h-40 object-cover rounded-md mb-2 ring-1 ring-transparent group-hover/person:ring-tungsten-400/50 group-hover/person:scale-[1.03] transition-[transform,box-shadow] duration-300"
                   />
                 ) : (
-                  <div className="w-full h-40 bg-surface-light rounded-md flex items-center justify-center mb-2">
-                    <span className="text-3xl">👤</span>
+                  <div className="w-full h-40 bg-surface-2 rounded-md flex items-center justify-center mb-2 ring-1 ring-transparent group-hover/person:ring-tungsten-400/50 transition-shadow duration-300">
+                    <span className="font-display text-2xl text-ink-faint">
+                      {actor.name.charAt(0)}
+                    </span>
                   </div>
                 )}
                 <p
-                  className="font-semibold text-xs truncate"
+                  className="font-semibold text-xs truncate group-hover/person:text-tungsten-300 transition-colors"
                   title={actor.name}
                 >
                   {actor.name}
                 </p>
                 <p
-                  className="text-gray-400 text-xs truncate"
+                  className="text-ink-mute text-xs truncate"
                   title={actor.character}
                 >
                   {actor.character}
                 </p>
-              </div>
+              </Link>
             ))}
 
             {/* Show More Button */}

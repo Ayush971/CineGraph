@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import type { CrewMember } from "../types";
 
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
@@ -122,31 +123,34 @@ const CrewList: React.FC<CrewListProps> = ({ crew }) => {
         >
           <div className="flex gap-3" style={{ width: "max-content" }}>
             {displayedCrew.map((member) => (
-              <div key={`${member.id}-${member.job}`} className="w-28 shrink-0">
+              <Link
+                to={`/person/${member.id}`}
+                key={`${member.id}-${member.job}`}
+                className="w-28 shrink-0 group/person"
+              >
                 {member.profile_path ? (
                   <img
                     src={`${TMDB_IMAGE_BASE}/w185${member.profile_path}`}
                     alt={member.name}
-                    className="w-full h-40 object-cover rounded-md mb-2"
+                    className="w-full h-40 object-cover rounded-md mb-2 ring-1 ring-transparent group-hover/person:ring-daylight-400/50 group-hover/person:scale-[1.03] transition-[transform,box-shadow] duration-300"
                   />
                 ) : (
-                  <div className="w-full h-40 bg-surface-light rounded-md flex items-center justify-center mb-2">
-                    <span className="text-3xl">👤</span>
+                  <div className="w-full h-40 bg-surface-2 rounded-md flex items-center justify-center mb-2 ring-1 ring-transparent group-hover/person:ring-daylight-400/50 transition-shadow duration-300">
+                    <span className="font-display text-2xl text-ink-faint">
+                      {member.name.charAt(0)}
+                    </span>
                   </div>
                 )}
                 <p
-                  className="font-semibold text-xs truncate"
+                  className="font-semibold text-xs truncate group-hover/person:text-daylight-300 transition-colors"
                   title={member.name}
                 >
                   {member.name}
                 </p>
-                <p
-                  className="text-gray-400 text-xs truncate"
-                  title={member.job}
-                >
+                <p className="text-ink-mute text-xs truncate" title={member.job}>
                   {member.job}
                 </p>
-              </div>
+              </Link>
             ))}
 
             {/* Show More Button */}

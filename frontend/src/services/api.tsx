@@ -18,7 +18,8 @@ import type {
   ListItem,
   ListItemCreate,
   ListReorderItem,
-  RecommendationResponse
+  RecommendationResponse,
+  PersonDetail
 } from '../types';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
@@ -221,6 +222,12 @@ export const analyticsAPI = {
 
   getYearInReview: (year?: number) =>
     api.get('/analytics/year-in-review', { params: year ? { year } : {} }),
+};
+
+// People API
+export const peopleAPI = {
+  getDetail: (personId: number) =>
+    api.get<PersonDetail>(`/people/${personId}`),
 };
 
 // Recommendations API

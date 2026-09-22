@@ -352,6 +352,40 @@ export interface AnalyticsOverview {
   total_movies: number;
 }
 
+// ==================== PEOPLE ====================
+
+export interface PersonCredit {
+  tmdb_id: number;
+  title: string;
+  poster_path?: string;
+  release_date?: string;
+  vote_average?: number;
+  vote_count?: number;
+  /** Character name for acting credits, job title for crew credits. */
+  role?: string;
+}
+
+export interface CreditGroup {
+  label: string;
+  credits: PersonCredit[];
+}
+
+export interface PersonDetail {
+  tmdb_id: number;
+  name: string;
+  biography?: string;
+  birthday?: string;
+  deathday?: string;
+  place_of_birth?: string;
+  profile_path?: string;
+  known_for_department?: string;
+  also_known_as: string[];
+  imdb_id?: string;
+  homepage?: string;
+  credit_groups: CreditGroup[];
+  total_credits: number;
+}
+
 // ==================== RECOMMENDATIONS ====================
 
 export interface Recommendation {

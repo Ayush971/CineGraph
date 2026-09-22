@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Alert from '../components/ui/Alert';
+import Button from '../components/ui/Button';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -20,66 +22,79 @@ const LoginPage: React.FC = () => {
       await login({ email, password });
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed');
+      const status = err.response?.status;
+      // The API returns the same "Invalid credentials" for an unknown email and
+      // a wrong password (deliberately — it stops anyone probing which emails
+      // have accounts). Say something more human without leaking which it was.
+      if (status === 401) {
+        setError("That email and password don't match. Please try again.");
+      } else if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError("Couldn't reach the server. Check your connection and try again.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  const inputClasses =
+    'w-full px-4 py-3 bg-surface-3 border border-line rounded-md text-ink placeholder:text-ink-faint focus:outline-none focus:border-daylight-400/60 focus:shadow-[var(--shadow-glow-cool)] transition-[border-color,box-shadow] duration-150';
+
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] px-4">
-      <div className="bg-surface p-8 rounded-lg shadow-xl w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center mb-6">Login to CineGraph</h2>
-        
-        {error && (
-          <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] px-4 py-12">
+      <div className="bg-surface border border-line p-8 rounded-2xl shadow-[var(--shadow-lift)] w-full max-w-md">
+        <p className="meta !text-tungsten-300 mb-2">Welcome Back</p>
+        <h1 className="font-display font-bold text-3xl mb-7">
+          Log in to CineGraph
+        </h1>
+
+        {error && <Alert className="mb-5">{error}</Alert>}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2">
+            <label htmlFor="email" className="meta block mb-2">
               Email
             </label>
             <input
               id="email"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-surface-light border border-gray-700 rounded focus:outline-none focus:border-primary transition-colors"
+              className={inputClasses}
               placeholder="your@email.com"
               required
             />
           </div>
-          
+
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-2">
+            <label htmlFor="password" className="meta block mb-2">
               Password
             </label>
             <input
               id="password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-surface-light border border-gray-700 rounded focus:outline-none focus:border-primary transition-colors"
+              className={inputClasses}
               placeholder="Enter your password"
               required
             />
           </div>
-          
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-primary text-white rounded font-semibold hover:bg-tungsten-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
+
+          <Button type="submit" size="lg" disabled={loading} className="w-full">
+            {loading ? 'Logging in…' : 'Log in'}
+          </Button>
         </form>
-        
-        <p className="text-center text-gray-400 mt-6">
+
+        <p className="text-center text-ink-mute text-sm mt-7">
           Don't have an account?{' '}
-          <Link to="/register" className="text-primary hover:underline">
+          <Link
+            to="/register"
+            className="text-daylight-300 hover:text-daylight-400 transition-colors"
+          >
             Sign up
           </Link>
         </p>

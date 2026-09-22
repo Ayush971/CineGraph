@@ -15,6 +15,7 @@ const DiaryPage = lazy(() => import("./pages/DiaryPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const MovieDetailPage = lazy(() => import("./pages/MovieDetailPage"));
+const PersonPage = lazy(() => import("./pages/PersonPage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
 const ListsPage = lazy(() => import("./pages/ListsPage"));
 const ListDetailPage = lazy(() => import("./pages/ListDetailPage"));
@@ -67,6 +68,7 @@ function AppContent() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/movie/:id" element={<MovieDetailPage />} />
+                <Route path="/person/:id" element={<PersonPage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/lists" element={<ListsPage />} />
                 <Route path="/lists/discover" element={<ListDiscoverPage />} />

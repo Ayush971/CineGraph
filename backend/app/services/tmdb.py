@@ -61,6 +61,19 @@ class TMDBService:
         """Get cast and crew for a movie"""
         return self._make_request(f"movie/{movie_id}/credits")
 
+    def get_person_details(self, person_id: int) -> Dict:
+        """Get biography and basic facts for a person"""
+        return self._make_request(f"person/{person_id}")
+
+    def get_person_movie_credits(self, person_id: int) -> Dict:
+        """
+        Get a person's movie credits (cast + crew).
+
+        Movies only, not `combined_credits` — TV credits would link to
+        /movie/:id pages that don't exist, and the Series section isn't built.
+        """
+        return self._make_request(f"person/{person_id}/movie_credits")
+
     def get_recommendations(self, movie_id: int, page: int = 1) -> Dict:
         """Get TMDB recommendations for a movie"""
         return self._make_request(f"movie/{movie_id}/recommendations", {"page": page})
